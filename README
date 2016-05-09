@@ -1,0 +1,6 @@
+Volatility Profile Discovery
+============================
+
+First approach at determining the OS laying into a memory dump. Based on simple
+occurences counting, but quite accurate.
+
