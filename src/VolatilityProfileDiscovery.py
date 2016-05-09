@@ -96,7 +96,9 @@ class ProfileDiscovery:
         s = sorted(elements.items(), key=operator.itemgetter(1), reverse=True)
 
         # Returns the OS with the higher number of occurences
-        return s[0][0]
+        if elements[s[0][0]] > 0:
+            return s[0][0]
+        return ""
 
 
     def handle_windows(self, probable_os):
@@ -143,15 +145,14 @@ class ProfileDiscovery:
         ####### EXPERIMENTAL ########
 
         # Tries to guess the unix version
-        flavor = [re.findall(r'vmlinuz-*-*-*', line) for line in open(self.dump)]
+        flavor = [re.findall(r'vmlinuz-\d+[\.\d+]*-\d+', line) for line in open(self.dump)]
         filtered = [f for f in flavor if f != []]
-        print(filtered[0])
-
 
         if probable_os == "debian":
             # Uses the same method as for the OS finding
             probable_distrib = self.mini_grep(self.debian_distributions)
-            print("[+] Probable OS: {0} {1}".format(probable_os, probable_distrib))
+            print("[+] Probable OS: {0} {1} ({2})".format(
+                probable_os, probable_distrib, filtered[0][0]))
             return
 
         if probable_os == "ubuntu":
@@ -162,5 +163,7 @@ class ProfileDiscovery:
         if probable_os == "linux":
             # TODO
             print("[+] Probable OS: {0}".format(probable_os))
+            return
 
 
+        print("[-] Operating system not found")
