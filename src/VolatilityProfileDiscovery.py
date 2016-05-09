@@ -28,7 +28,6 @@ class ProfileExplorer:
     """
 
     os_names = {
-        'linux': 0,
         'ubuntu': 0,
         'debian': 0,
         'windows': 0,
@@ -78,6 +77,11 @@ class ProfileExplorer:
                 break
             yield chunk
 
+    def print_debug(self, elements):
+        if os.environ["DEBUG"]:
+            for x in elements:
+                print("[ ] DEBUG: {0}: \t{1}".format(x[0], x[1]))
+
 
     def mini_grep(self, elements):
         """
@@ -96,6 +100,8 @@ class ProfileExplorer:
 
         # Order the OSes by number of occurences, decreasing order.
         s = sorted(elements.items(), key=operator.itemgetter(1), reverse=True)
+
+        self.print_debug(s)
 
         # Returns the OS with the higher number of occurences
         if elements[s[0][0]] > 0:
@@ -155,17 +161,20 @@ class ProfileExplorer:
 
         # Tries to guess the unix version
         # AKA 'vmlinuz-MAJOR.MINOR(s)-rev
-        try:
-            flavor = [re.findall(r'vmlinuz-\d+[\.\d+]*-\d+', line)
-                    for line in open(self.dump)]
-            filtered = [f for f in flavor if f != []]
-            version = filtered[0][0]
-        except:
-            version = "Unknown"
+        with open(self.dump, "rb") as f:
+            for chunk in self.read_file(f):
+                tmp = re.search(r'vmlinuz-\d+[\.\d+]*-\d+', chunk)
 
+                if tmp != None: print(dir(tmp.re))
+                if tmp != None and tmp.groups() != ():
+                    version = tmp.groups()
+                    #break
+
+        # Debian dump
         if probable_os == "debian":
             # Uses the same method as for the OS finding
-            probable_distrib = self.mini_grep(self.debian_distributions)
+            probable_distrib = "LOL"#self.mini_grep(self.debian_distributions)
+
 
         print("[+] Probable OS            : {0}".format(probable_os))
         print("[+] Probable Distribution  : {0}".format(probable_distrib))
@@ -194,6 +203,8 @@ if __name__ in "__main__":
 
     if len(sys.argv) < 2:
         print_usage_and_exit()
+
+    print("Launching discovery - Please wait...")
 
     vpd = ProfileExplorer(sys.argv[1])
     vpd.discover()
