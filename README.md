@@ -11,3 +11,8 @@ cd src/
 ./VolatilityProfileDiscovery DUMP
 ```
 
+The same things can be done with grep, which may be way faster. But I wanted
+something architecture independant.
+
+Works OK for windows and linux.
+Doesn't work for osx (yes, osx uses 'windows' object)

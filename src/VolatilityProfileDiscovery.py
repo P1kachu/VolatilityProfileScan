@@ -28,6 +28,7 @@ class ProfileExplorer:
     """
 
     os_names = {
+        'android': 0,
         'ubuntu': 0,
         'debian': 0,
         'windows': 0,
@@ -77,12 +78,6 @@ class ProfileExplorer:
                 break
             yield chunk
 
-    def print_debug(self, elements):
-        if os.environ["DEBUG"]:
-            for x in elements:
-                print("[ ] DEBUG: {0}: \t{1}".format(x[0], x[1]))
-
-
     def mini_grep(self, elements):
         """
         Tries to determine the operating system from the file by counting the
@@ -101,8 +96,6 @@ class ProfileExplorer:
         # Order the OSes by number of occurences, decreasing order.
         s = sorted(elements.items(), key=operator.itemgetter(1), reverse=True)
 
-        self.print_debug(s)
-
         # Returns the OS with the higher number of occurences
         if elements[s[0][0]] > 0:
             return s[0][0]
@@ -120,8 +113,12 @@ class ProfileExplorer:
         registry.register_global_options(config, commands.Command)
         registry.register_global_options(config, addrspace.BaseAddressSpace)
         config.LOCATION = 'file://{0}'.format(self.dump)
-        infos = imageinfo.ImageInfo(config)
-        data = infos.execute()
+        try:
+            infos = imageinfo.ImageInfo(config)
+            data = infos.execute()
+
+        except Exception as e:
+            print("[-] Exception in Volatility: {0}".format(e))
 
 
     def handle_osx(self, probable_os):
@@ -136,6 +133,9 @@ class ProfileExplorer:
         """
         Main operations
         """
+
+        # Try to determine the OS in a more clever fashion
+        #probable_os = self.find_patterns()
 
         # Guess the OS
         probable_os = self.mini_grep(self.os_names)
@@ -163,17 +163,15 @@ class ProfileExplorer:
         # AKA 'vmlinuz-MAJOR.MINOR(s)-rev
         with open(self.dump, "rb") as f:
             for chunk in self.read_file(f):
-                tmp = re.search(r'vmlinuz-\d+[\.\d+]*-\d+', chunk)
-
-                if tmp != None: print(dir(tmp.re))
-                if tmp != None and tmp.groups() != ():
-                    version = tmp.groups()
-                    #break
+                tmp = re.search(r'vmlinuz-[\d\.-]*', chunk)
+                if tmp != None:
+                    version = tmp.group()
+                    break
 
         # Debian dump
         if probable_os == "debian":
             # Uses the same method as for the OS finding
-            probable_distrib = "LOL"#self.mini_grep(self.debian_distributions)
+            probable_distrib = self.mini_grep(self.debian_distributions)
 
 
         print("[+] Probable OS            : {0}".format(probable_os))
