@@ -1,3 +1,5 @@
+#!/usr/bin/python2
+
 """
 Volatility Profile Discovery Tool
 
@@ -18,7 +20,7 @@ import volatility.plugins.imageinfo as imageinfo
 
 
 # OS NAMES
-class ProfileDiscovery:
+class ProfileExplorer:
     """
     Used to guess the operating system lying in a dump in order to choose a
     profile for Volatility
@@ -168,3 +170,29 @@ class ProfileDiscovery:
 
 
         print("[-] Operating system not found")
+
+
+
+# -----------------------------------------------------------------------------
+
+
+
+def print_banner():
+    banner = "Volatility Profile Discovery tool"
+    print(banner)
+    print("-" * len(banner))
+    print("")
+
+def print_usage_and_exit():
+    print("USAGE: {0} DUMP".format(sys.argv[0]))
+    exit(0)
+
+if __name__ in "__main__":
+    print_banner()
+
+    if len(sys.argv) < 2:
+        print_usage_and_exit()
+
+    vpd = ProfileExplorer(sys.argv[1])
+    vpd.discover()
+
