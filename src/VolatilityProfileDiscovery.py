@@ -100,7 +100,7 @@ class ProfileExplorer:
         # Returns the OS with the higher number of occurences
         if elements[s[0][0]] > 0:
             return s[0][0]
-        return ""
+        return "Unknown"
 
 
     def handle_windows(self, probable_os):
@@ -134,6 +134,11 @@ class ProfileExplorer:
         # Guess the OS
         probable_os = self.mini_grep(self.os_names)
 
+        if probable_os == "Unknown":
+            print("[-] Operating system not found")
+            return
+
+
         # Windows dump
         if probable_os == "windows":
             self.handle_windows(probable_os)
@@ -145,31 +150,28 @@ class ProfileExplorer:
             return
 
         ####### EXPERIMENTAL ########
+        version = "Unknown"
+        probable_distrib = "Unknown"
 
         # Tries to guess the unix version
         # AKA 'vmlinuz-MAJOR.MINOR(s)-rev
-        flavor = [re.findall(r'vmlinuz-\d+[\.\d+]*-\d+', line) for line in open(self.dump)]
-        filtered = [f for f in flavor if f != []]
+        try:
+            flavor = [re.findall(r'vmlinuz-\d+[\.\d+]*-\d+', line)
+                    for line in open(self.dump)]
+            filtered = [f for f in flavor if f != []]
+            version = filtered[0][0]
+        except:
+            version = "Unknown"
 
         if probable_os == "debian":
             # Uses the same method as for the OS finding
             probable_distrib = self.mini_grep(self.debian_distributions)
-            print("[+] Probable OS: {0} {1} ({2})".format(
-                probable_os, probable_distrib, filtered[0][0]))
-            return
 
-        if probable_os == "ubuntu":
-            # TODO
-            print("[+] Probable OS: {0}".format(probable_os))
-            return
-
-        if probable_os == "linux":
-            # TODO
-            print("[+] Probable OS: {0}".format(probable_os))
-            return
+        print("[+] Probable OS            : {0}".format(probable_os))
+        print("[+] Probable Distribution  : {0}".format(probable_distrib))
+        print("[+] Probable Kernel version: {0}".format(version))
 
 
-        print("[-] Operating system not found")
 
 
 
