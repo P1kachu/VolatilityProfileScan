@@ -145,6 +145,7 @@ class ProfileDiscovery:
         ####### EXPERIMENTAL ########
 
         # Tries to guess the unix version
+        # AKA 'vmlinuz-MAJOR.MINOR(s)-rev
         flavor = [re.findall(r'vmlinuz-\d+[\.\d+]*-\d+', line) for line in open(self.dump)]
         filtered = [f for f in flavor if f != []]
 
