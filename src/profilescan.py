@@ -1,20 +1,21 @@
 import volatility.scan as scan
-import volatility.plugins.common as common
 import volatility.utils as utils
-import volatility.addrspace as addrspace
+import volatility.commands as commands
+
 
 class SignatureScanner(scan.BaseScanner):
-    checks = [ ]
+    checks = []
 
-    def __init__(self, signatures = None):
-        self.checks = [ ("SignatureCheck", {'signatures':signatures})]
+    def __init__(self, signatures=None):
+        self.checks = [("SignatureCheck", {'signatures': signatures})]
         scan.BaseScanner.__init__(self)
+
 
 class SignatureCheck(scan.ScannerCheck):
     """ Looks for binary signature """
     signature_hashes = []
 
-    def __init__(self, address_space, signatures = None):
+    def __init__(self, address_space, signatures=None):
         scan.ScannerCheck.__init__(self, address_space)
         if not signatures:
             signatures = []
@@ -27,7 +28,6 @@ class SignatureCheck(scan.ScannerCheck):
 
         return chunk | mask == magic
 
-
     def check(self, offset):
         for signature in self.signature_hashes:
             print("Chunk")
@@ -35,59 +35,51 @@ class SignatureCheck(scan.ScannerCheck):
             return self.signature_matches(signature, dump_chunk)
 
 
-class ProfileScan(common.AbstractScanCommand):
+class ProfileScan(commands.Command):
     """
-    Scan for every executable format it might found to try to determine
-    underlaying OS
+    \033[31;1mScan for executables to try to determine the underlying OS\033[0m
     """
 
-            {
-                'name': "elf",
-                'magic': '\x1fELF',
-                'offset': 0,
-                'mask': '\xff\xff\xff\xff'
-                },
-            {
-                'name':'pe'
-                'magic': '\x5a\x40',
-                'offset': 0,
-                'mask': '\xff\xff'
-                },
-            {
-                'name':'exe'
-                'magic': '\x4d\x5a',
-                'offset': 0,
-                'mask': '\xff\xff'
-                },
-            {
-                'name': 'mach-o_32',
-                'magic': '\xfe\xed\xfa\xce',
-                'offset': 0,
-                'mask': '\xff\xff\xff\xff'
+    signatures = [{
+        'name': "elf",
+        'magic': '\x1fELF',
+        'offset': 0,
+        'mask': '\xff\xff\xff\xff'
+    }, {
+        'name': 'pe',
+        'magic': '\x5a\x40',
+        'offset': 0,
+        'mask': '\xff\xff'
+    }, {
+        'name': 'exe',
+        'magic': '\x4d\x5a',
+        'offset': 0,
+        'mask': '\xff\xff'
+    }, {
+        'name': 'mach-o_32',
+        'magic': '\xfe\xed\xfa\xce',
+        'offset': 0,
+        'mask': '\xff\xff\xff\xff'
 
-                },
-            {
-                'name': 'mach-o_64',
-                'magic': '\xfe\xed\xfa\xcf',
-                'offset': 0,
-                'mask': '\xff\xff\xff\xff'
+    }, {
+        'name': 'mach-o_64',
+        'magic': '\xfe\xed\xfa\xcf',
+        'offset': 0,
+        'mask': '\xff\xff\xff\xff'
 
-                },
-            {
-                'name': 'osx_dmg',
-                'magic': '\x78\x01\x73\x0d\x62\x62\x60',
-                'offset': 0,
-                'mask': '\xff\xff\xff\xff\xff\xff\xff'
+    }, {
+        'name': 'osx_dmg',
+        'magic': '\x78\x01\x73\x0d\x62\x62\x60',
+        'offset': 0,
+        'mask': '\xff\xff\xff\xff\xff\xff\xff'
 
-                }
-            ]
-
-    def __init__(self, config, *args, **kwargs):
-        common.AbstractScanCommand.__init__(self, config, *args, **kwargs)
+    }]
 
     def calculate(self):
-        address_space = utils.load_as(self._config, astype = 'physical')
+        address_space = utils.load_as(self._config, astype='physical')
         scanner = SignatureScanner(self.signatures)
         for offset in scanner.scan(address_space):
             print(offset)
 
+    def render_text(self, outfd, data):
+        outfd.write('Hello world!\n')
