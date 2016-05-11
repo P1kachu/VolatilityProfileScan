@@ -9,9 +9,6 @@ Useful for choosing a profile for analysis in Volatility after.
 The same things can be done with grep, which may be way faster. But I wanted
 something architecture independant and which fits into Volatility.
 
-Works OK for windows, mac and linux (haven't tried for anything else yet, like
-android and stuff).
-
 ## Demo on the batch of samples from AMF:
 
 This is a small sample of what the plugin can do when asked to recover the dump's
