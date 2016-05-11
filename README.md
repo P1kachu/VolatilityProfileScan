@@ -6,8 +6,14 @@ dump. Based on simple occurences counting, but quite accurate.
 
 Useful for choosing a profile for analysis in Volatility after.
 
-The same things can be done with grep, which may be way faster. But I wanted
-something architecture independant and which fits into Volatility.
+The same things can be done with grep, which may be way faster (but less
+accurate). But I wanted something architecture independant and which fits into
+Volatility.
+
+Problems right now:
+* It the user runs a VM, detection might return the VM's OS.
+* Quite slow
+* Very few informations
 
 ## Demo on the batch of samples from AMF:
 

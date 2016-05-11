@@ -132,7 +132,8 @@ class ProfileScan(commands.Command):
 
         for offst in scanner.scan(address_space):
             # Read the two first bytes at the offst that triggered
-            # Might be a simpler way to do that (return format instead of offst ?)
+            # Might be a simpler way to do that (return format instead of
+            # offst ?)
             magic = address_space.zread(offst, 0x2)
 
             # Compare to each signature's first two bytes,
@@ -141,14 +142,16 @@ class ProfileScan(commands.Command):
                 if sig['magic'][:2] == magic:
                     self.occurences[sig['os_id']] += 1
                     if self._config.get_value('verbose') != 0:
-                        print("[ ] DEBUG: {0} found at offst {1}".format(sig['formt'], hex(offst)))
+                        to_print = "[ ] DEBUG: {0} found at offst {1}"
+                        print(to_print.format(sig['formt'], hex(offst)))
 
                     # If minimum limit was reached, check if it is > THRESHOLD
-                    if max([self.occurences[item] for item in self.occurences]) > MIN_LIMIT:
+                    maximum = max([self.occurences[x] for x in self.occurences])
+                    if maximum > MIN_LIMIT:
                         for occ in self.occurences:
-                            nb_of_occurences = self.occurences[occ]
-                            percentage = nb_of_occurences / sum([self.occurences[item] for item in self.occurences]) * 100
-                            if nb_of_occurences > MIN_LIMIT and percentage > THRESHOLD:
+                            nb_occ = self.occurences[occ]
+                            percentage = nb_occ / sum([self.occurences[x] for x in self.occurences]) * 100
+                            if nb_occ > MIN_LIMIT and percentage > THRESHOLD:
                                 hightest_id = sorted(self.occurences.items(), key=operator.itemgetter(1), reverse=True)[0][0]
                                 return hightest_id, percentage
 
