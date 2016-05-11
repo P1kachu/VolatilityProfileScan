@@ -23,22 +23,22 @@ class SignatureCheck(scan.ScannerCheck):
             signatures = []
         self.signature_hashes = signatures
 
-    def check(self, offset):
+    def check(self, offst):
         """
         Check for each executable format if the byte sequence
-        at offset matches its signature
-        :param offset: offset to check - multiple of PAGE_SIZE
+        at offst matches its signature
+        :param offst: offst to check - multiple of PAGE_SIZE
         :return: boolean
         """
 
         # Might be a way to do that in superclass
-        if offset % self.PAGE_SIZE:
+        if offst % self.PAGE_SIZE:
             return False
 
         for signature in self.signature_hashes:
 
             # Read sequence of bytes of length equal to the signature's length
-            dump_chunk = self.address_space.read(offset, len(signature['magic']))
+            dump_chunk = self.address_space.read(offst, len(signature['magic']))
 
             # Convert hex strings to int to perform comparison
             magic = int(signature['magic'].encode('hex'), 16)
@@ -57,62 +57,56 @@ class ProfileScan(commands.Command):
 
     dos_mode_string = 'This program cannot be run in DOS mode'
     signatures = [{
-        'name': "elf",
-        'id': 'lin',
+        'formt': "elf",
+        'os_id': 'lin',
         'magic': '\x7F\x45\x4C\x46\xff\x01\x01\xff\x00\x00\x00\x00\x00\x00\x00\x00',
-        'offset': 0,
+        'offst': 0,
         'mask': '\x00\x00\x00\x00\xff\x00\x00\xff\x00\x00\x00\x00\x00\x00\x00\x00'
     }, {
-        'name': 'dos_mode',
-        'id': 'win',
+        'formt': 'dos_mode',
+        'os_id': 'win',
         'magic': dos_mode_string,
-        'offset': 0,
+        'offst': 0,
         'mask': len(dos_mode_string) * "\x00",
-        # }, {
-        #     'name': 'pe',
-        #     'id': 'win',
-        #     'magic': '\x5a\x40',
-        #     'offset': 0,
-        #     'mask': '\x00\x00'
     }, {
-        'name': 'exe',
-        'id': 'win',
+        'formt': 'exe',
+        'os_id': 'win',
         'magic': '\x4d\x5a\xff\x00\xff\x00\x00\x00\xff\x00\xff\x00\xff\xff\x00\x00',
-        'offset': 0,
+        'offst': 0,
         'mask': '\x00\x00\xff\x00\xff\x00\x00\x00\xff\x00\xff\x00\xff\xff\x00\x00',
     }, {
-        'name': 'mach-o_32',
-        'id': 'mac',
+        'formt': 'mach-o_32',
+        'os_id': 'mac',
         'magic': '\xfe\xed\xfa\xce',
-        'offset': 0,
+        'offst': 0,
         'mask': '\x00\x00\x00\x00'
 
     }, {
-        'name': 'mach-o_64',
-        'id': 'mac',
+        'formt': 'mach-o_64',
+        'os_id': 'mac',
         'magic': '\xfe\xed\xfa\xcf',
-        'offset': 0,
+        'offst': 0,
         'mask': '\x00\x00\x00\x00'
 
     }, {
-        'name': 'mach-o_32-rev',
-        'id': 'mac',
+        'formt': 'mach-o_32-rev',
+        'os_id': 'mac',
         'magic': '\xce\xfa\xed\xfe',
-        'offset': 0,
+        'offst': 0,
         'mask': '\x00\x00\x00\x00'
 
     }, {
-        'name': 'mach-o_64-rev',
-        'id': 'mac',
+        'formt': 'mach-o_64-rev',
+        'os_id': 'mac',
         'magic': '\xcf\xfa\xed\xfe',
-        'offset': 0,
+        'offst': 0,
         'mask': '\x00\x00\x00\x00'
 
     }, {
-        'name': 'mac_dmg',
-        'id': 'mac',
+        'formt': 'mac_dmg',
+        'os_id': 'mac',
         'magic': '\x78\x01\x73\x0d\x62\x62\x60',
-        'offset': 0,
+        'offst': 0,
         'mask': '\x00\x00\x00\x00\x00\x00\x00'
 
     }]
@@ -136,18 +130,18 @@ class ProfileScan(commands.Command):
 
         scanner = SignatureScanner(self.signatures)
 
-        for offset in scanner.scan(address_space):
-            # Read the two first bytes at the offset that triggered
-            # Might be a simpler way to do that (return format instead of offset ?)
-            magic = address_space.zread(offset, 0x2)
+        for offst in scanner.scan(address_space):
+            # Read the two first bytes at the offst that triggered
+            # Might be a simpler way to do that (return format instead of offst ?)
+            magic = address_space.zread(offst, 0x2)
 
             # Compare to each signature's first two bytes,
             # and increment the right id
             for sig in self.signatures:
                 if sig['magic'][:2] == magic:
-                    self.occurences[sig['id']] += 1
+                    self.occurences[sig['os_id']] += 1
                     if self._config.get_value('verbose') != 0:
-                        print("[ ] DEBUG: {0} found at offset {1}".format(sig['name'], hex(offset)))
+                        print("[ ] DEBUG: {0} found at offst {1}".format(sig['formt'], hex(offst)))
 
                     # If minimum limit was reached, check if it is > THRESHOLD
                     if max([self.occurences[item] for item in self.occurences]) > MIN_LIMIT:
