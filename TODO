@@ -6,4 +6,5 @@ TODO
 * Try to return the format found instead of the offset to avoir useless computations
 * Try to get more informations (linux distributions, mac versions)
 * Bind imageinfo when windows is diagnosed
+* Bind mac_get_profile when osx is diagnosed ?
 * Make it faster

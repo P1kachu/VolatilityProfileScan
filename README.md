@@ -1,5 +1,5 @@
-Volatility Profile Discovery
-============================
+Volatility ProfileScan
+======================
 
 First approach at determining any information about the OS lying into a memory
 dump. Based on simple occurences counting, but quite accurate.

@@ -155,7 +155,6 @@ class ProfileScan(commands.Command):
                             nb_of_occurences = self.occurences[occ]
                             percentage = nb_of_occurences / sum([self.occurences[item] for item in self.occurences]) * 100
                             if nb_of_occurences > MIN_LIMIT and percentage > THRESHOLD:
-                                print(percentage)
                                 hightest_id = sorted(self.occurences.items(), key=operator.itemgetter(1), reverse=True)[0][0]
                                 return hightest_id, percentage
 
@@ -168,4 +167,4 @@ class ProfileScan(commands.Command):
             probable_os = 'Windows'
         if highest == 'mac':
             probable_os = 'OSX'
-        outfd.write("Found OS: {0} ({1}%)".format(probable_os, percentage))
+        outfd.write("Found OS: {0} ({1}% match)\n".format(probable_os, percentage))
