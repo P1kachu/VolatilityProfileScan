@@ -16,6 +16,7 @@ OS with a minimum of 20 caracteristic executable. This means, an OS 'wins' only
 when 90% minimum of the executables found are his (exe->windows, elf->linux...),
 with at least 20 executables found.
 
+```sh
 linux-sample-1.bin
 Volatility Foundation Volatility Framework 2.5
 Found OS: Linux (100%)
@@ -148,3 +149,4 @@ Found OS: Windows (100%)
 real	0m27.764s
 user	0m27.710s
 sys	0m0.050s
+```
