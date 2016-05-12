@@ -59,9 +59,9 @@ class ProfileScan(commands.Command):
     signatures = [{
         'formt': "elf",
         'os_id': 'lin',
-        'magic': '\x7F\x45\x4C\x46\xff\x01\x01\xff\x00\x00\x00\x00\x00\x00\x00\x00',
+        'magic': '\x7F\x45\x4C\x46\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00',
         'offst': 0,
-        'mask': '\x00\x00\x00\x00\xff\x00\x00\xff\x00\x00\x00\x00\x00\x00\x00\x00'
+        'mask': '\x00\x00\x00\x00\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00'
     }, {
         'formt': 'dos_mode',
         'os_id': 'win',
@@ -156,6 +156,10 @@ class ProfileScan(commands.Command):
                                 return hightest_id, percentage
 
     def render_text(self, outfd, data):
+        if data == None:
+            outfd.write("OS not found.")
+            return
+
         highest, percentage = data
         probable_os = 'Unknown'
         if highest == 'lin':
