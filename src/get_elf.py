@@ -50,7 +50,7 @@ class ElfCheck(scan.ScannerCheck):
         return False
 
 
-class Linux_Get_Profile(commands.Command):
+class GetElfs(commands.Command):
     """
        Scan for executables to try to determine the underlying OS
     """
