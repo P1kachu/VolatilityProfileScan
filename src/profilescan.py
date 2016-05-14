@@ -2,6 +2,9 @@ import operator
 import volatility.scan as scan
 import volatility.utils as utils
 import volatility.commands as commands
+import volatility.plugins.imageinfo as imageinfo
+import volatility.plugins.linux as linux
+import volatility.plugins.mac as mac
 
 
 class SignatureScanner(scan.BaseScanner):
@@ -159,14 +162,22 @@ class ProfileScan(commands.Command):
     def render_text(self, outfd, data):
         if data is None:
             outfd.write("OS not found.")
+            outfd.write("Executables found: EXE {0} - MACH-O {1} - ELF {2}\n".format(
+                self.occurences['win'], self.occurences['mac'], self.occurences['lin']))
             return
 
         highest, percentage = data
-        probable_os = 'Unknown'
         if highest == 'lin':
-            probable_os = 'Linux'
-        if highest == 'win':
-            probable_os = 'Windows'
-        if highest == 'mac':
-            probable_os = 'OSX'
-        outfd.write("Found OS: {0} ({1}% match)\n".format(probable_os, percentage))
+            outfd.write("Found OS: LINUX - Launching LinuxGetProfile\n")
+            profile = linux.get_profile.LinuxGetProfile(self._config)
+            profile.render_text(outfd, profile.calculate())
+
+        elif highest == 'win':
+            outfd.write("Found OS: WINDOWS - Launching ImageInfo\n")
+            image = imageinfo.ImageInfo(self._config)
+            image.render_text(outfd, image.calculate())
+
+        else:
+            outfd.write("Found OS: OSX - Launching mac_get_profile\n")
+            profile = mac.get_profile.mac_get_profile(self._config)
+            profile.render_text(outfd, profile.calculate())

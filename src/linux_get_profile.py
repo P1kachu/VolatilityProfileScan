@@ -40,7 +40,7 @@ class VersionCheck(scan.ScannerCheck):
         return READ_SIZE
 
 
-class linux_get_profile(commands.Command):
+class LinuxGetProfile(commands.Command):
     """
        Scan to try to determine the Linux version
     """
