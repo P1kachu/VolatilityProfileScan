@@ -152,11 +152,12 @@ class ProfileScan(commands.Command):
                             nb_occ = self.occurences[occ]
                             percentage = nb_occ / sum([self.occurences[x] for x in self.occurences]) * 100
                             if nb_occ > MIN_LIMIT and percentage > THRESHOLD:
-                                hightest_id = sorted(self.occurences.items(), key=operator.itemgetter(1), reverse=True)[0][0]
+                                hightest_id = \
+                                    sorted(self.occurences.items(), key=operator.itemgetter(1), reverse=True)[0][0]
                                 return hightest_id, percentage
 
     def render_text(self, outfd, data):
-        if data == None:
+        if data is None:
             outfd.write("OS not found.")
             return
 
