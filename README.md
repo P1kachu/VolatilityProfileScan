@@ -15,7 +15,18 @@ Problems right now:
 * Quite slow
 * Few informations (mac_get_profile only works with Mavericks?)
 
-## Demo on the batch of samples from AMF:
+## How to use it ?
+
+Simply drop it into your volatility plugins directory, and run the following
+command:
+
+```console
+p1kachu@GreenLabOfGazon:profilescan$ volatility -f [dump] profilescan
+```
+
+You can get some more informations by specifying the `-v` command line parameter.
+
+## Demo on the batch of samples from [AMF][amf]:
 
 This is a small sample of what the plugin can do when asked to recover the dump's
 OS with a minimum of 20 caracteristic executable. This means, an OS 'wins' only
@@ -407,6 +418,9 @@ sys	0m0.283s
 
 
 ### dumps/sample005.bin
+
+Called plugins can fail, but generally the output is sufficient
+
  ```console
 
 Volatility Foundation Volatility Framework 2.5
@@ -545,4 +559,4 @@ sys	0m0.767s
 ```
 
 
-
+[amf]: http://www.memoryanalysis.net/#!amf/cmg5
