@@ -43,6 +43,19 @@ class linux_get_profile(commands.Command):
        Scan to try to determine the Linux version
     """
 
+    distribution_profiles = {
+            'centos': 'CentOS',
+            'cent os': 'CentOS',
+            'debian': 'Debian',
+            'fedora': 'Fedora',
+            'opensuse': 'OpenSUSE',
+            'open suse': 'OpenSUSE',
+            'redhat': 'Red Hat',
+            'red hat': 'Red Hat',
+            'ubuntu': 'Ubuntu',
+            '': 'Distribution Not found'
+            }
+
     def calculate(self):
         address_space = utils.load_as(self._config, astype='physical')
 
@@ -79,4 +92,9 @@ class linux_get_profile(commands.Command):
         outfd.write("    Kernel version: {0}\n".format(k_version))
         outfd.write("    Compiled by   : {0}\n".format(cmpile_by))
         outfd.write("    Compiler      : {0}\n".format(cmpiler))
+
+        for distrib in self.distribution_profiles:
+            if distrib in cmpiler.lower():
+                outfd.write('Profile: {0} ({1})'.format(self.distribution_profiles[distrib], k_version))
+                break
         outfd.flush()
